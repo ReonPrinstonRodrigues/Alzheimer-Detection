@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block title %}About{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1 class="page-title">About <span class="gradient-text">The Project</span></h1>
+        <p class="page-subtitle">Understanding Alzheimer's Disease, our dataset, and the technology behind the detection system.</p>
+    </div>
+</section>
+
+<!-- What is Alzheimer's -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6">
+                <div class="about-icon-box mb-4">
+                    <i class="bi bi-heart-pulse fs-1 text-accent"></i>
+                </div>
+                <h2 class="mb-3">What is <span class="gradient-text">Alzheimer's Disease</span>?</h2>
+                <p class="text-muted">
+                    Alzheimer's disease is the most common cause of dementia — a general term for memory loss and other 
+                    cognitive abilities serious enough to interfere with daily life. It accounts for 60-80% of dementia cases.
+                </p>
+                <p class="text-muted">
+                    The disease is not a normal part of aging. The greatest known risk factor is increasing age, and the 
+                    majority of people with Alzheimer's are 65 and older. It is a progressive disease, where symptoms 
+                    gradually worsen over time. In its early stages, memory loss is mild, but with late-stage Alzheimer's, 
+                    individuals lose the ability to carry on a conversation and respond to their environment.
+                </p>
+                <div class="row g-3 mt-3">
+                    <div class="col-6">
+                        <div class="mini-stat-card">
+                            <div class="mini-stat-number">55M+</div>
+                            <div class="mini-stat-label">People affected worldwide</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="mini-stat-card">
+                            <div class="mini-stat-number">6th</div>
+                            <div class="mini-stat-label">Leading cause of death</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="info-cards-stack">
+                    <div class="info-card glass-card">
+                        <i class="bi bi-1-circle text-accent me-3 fs-4"></i>
+                        <div>
+                            <h6 class="mb-1">Preclinical Stage</h6>
+                            <p class="small text-muted mb-0">Brain changes begin years before symptoms appear. Detectable via advanced imaging.</p>
+                        </div>
+                    </div>
+                    <div class="info-card glass-card">
+                        <i class="bi bi-2-circle text-accent me-3 fs-4"></i>
+                        <div>
+                            <h6 class="mb-1">Mild Cognitive Impairment</h6>
+                            <p class="small text-muted mb-0">Early memory and thinking problems that are noticeable but don't affect daily activities.</p>
+                        </div>
+                    </div>
+                    <div class="info-card glass-card">
+                        <i class="bi bi-3-circle text-accent me-3 fs-4"></i>
+                        <div>
+                            <h6 class="mb-1">Dementia Due to Alzheimer's</h6>
+                            <p class="small text-muted mb-0">Significant memory, cognitive, and behavioral symptoms impacting daily function.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About the Dataset -->
+<section class="section-padding bg-darker">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">The OASIS <span class="gradient-text">Dataset</span></h2>
+            <p class="section-subtitle">Open Access Series of Imaging Studies — Brain MRI Collection</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8 mx-auto">
+                <div class="glass-card p-4 mb-4">
+                    <p class="text-muted mb-3">
+                        The <strong class="text-white">OASIS (Open Access Series of Imaging Studies)</strong> project 
+                        provides free access to brain imaging datasets aimed at making MRI data available to the scientific 
+                        community. Our system uses a curated version of this dataset containing <strong class="text-white">86,437 
+                        MRI brain scan images</strong> categorized into 4 classes of Alzheimer's severity.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-2">
+            <div class="col-md-6 col-lg-3">
+                <div class="dataset-card">
+                    <div class="dataset-color" style="background: #2ecc71;"></div>
+                    <h5>Non Demented</h5>
+                    <div class="dataset-count">67,222</div>
+                    <div class="dataset-pct">77.8%</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="dataset-card">
+                    <div class="dataset-color" style="background: #f39c12;"></div>
+                    <h5>Very Mild</h5>
+                    <div class="dataset-count">13,725</div>
+                    <div class="dataset-pct">15.9%</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="dataset-card">
+                    <div class="dataset-color" style="background: #e67e22;"></div>
+                    <h5>Mild</h5>
+                    <div class="dataset-count">5,002</div>
+                    <div class="dataset-pct">5.8%</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="dataset-card">
+                    <div class="dataset-color" style="background: #e74c3c;"></div>
+                    <h5>Moderate</h5>
+                    <div class="dataset-count">488</div>
+                    <div class="dataset-pct">0.6%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Technologies Used -->
+<section class="section-padding">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Technologies <span class="gradient-text">Used</span></h2>
+            <p class="section-subtitle">Built with modern tools for accurate and reliable detection</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="tech-card">
+                    <i class="bi bi-gpu-card"></i>
+                    <h6>TensorFlow</h6>
+                    <p class="small text-muted">Deep Learning</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="tech-card">
+                    <i class="bi bi-boxes"></i>
+                    <h6>Keras</h6>
+                    <p class="small text-muted">Neural Networks</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="tech-card">
+                    <i class="bi bi-window-desktop"></i>
+                    <h6>Flask</h6>
+                    <p class="small text-muted">Web Framework</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="tech-card">
+                    <i class="bi bi-eye"></i>
+                    <h6>OpenCV</h6>
+                    <p class="small text-muted">Image Processing</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="tech-card">
+                    <i class="bi bi-calculator"></i>
+                    <h6>NumPy</h6>
+                    <p class="small text-muted">Numerical Computing</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="tech-card">
+                    <i class="bi bi-bar-chart-line"></i>
+                    <h6>Scikit-learn</h6>
+                    <p class="small text-muted">ML Utilities</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="tech-card">
+                    <i class="bi bi-graph-up"></i>
+                    <h6>Matplotlib</h6>
+                    <p class="small text-muted">Visualization</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="tech-card">
+                    <i class="bi bi-database"></i>
+                    <h6>SQLite</h6>
+                    <p class="small text-muted">Database</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Team -->
+<section class="section-padding bg-darker">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="section-title mb-4">About the <span class="gradient-text">Project</span></h2>
+                <div class="glass-card p-4">
+                    <p class="text-muted mb-3">
+                        This project was developed as an end-to-end machine learning application for Alzheimer's 
+                        disease detection using brain MRI scans. It combines advanced deep learning techniques with 
+                        a user-friendly web interface to provide accessible medical image analysis.
+                    </p>
+                    <p class="text-muted mb-0">
+                        Six different neural network architectures were trained and evaluated, including custom CNN, 
+                        MLP, and four transfer learning models (VGG16, ResNet50, EfficientNetB0, MobileNetV2). The 
+                        best-performing model is deployed in this web application for real-time predictions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

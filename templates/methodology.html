@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+{% block title %}Methodology{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1 class="page-title">ML <span class="gradient-text">Methodology</span></h1>
+        <p class="page-subtitle">A step-by-step walkthrough of our machine learning pipeline for Alzheimer's detection.</p>
+    </div>
+</section>
+
+<!-- Pipeline Timeline -->
+<section class="section-padding">
+    <div class="container">
+        <div class="pipeline-timeline">
+            <!-- Step 1 -->
+            <div class="pipeline-step" data-animate="fadeInLeft">
+                <div class="step-connector"></div>
+                <div class="step-marker">
+                    <div class="step-marker-inner">1</div>
+                </div>
+                <div class="step-content glass-card">
+                    <div class="step-badge">Data Collection</div>
+                    <h4><i class="bi bi-collection me-2 text-accent"></i>OASIS MRI Dataset</h4>
+                    <p class="text-muted">
+                        Loaded 86,437 brain MRI scan images from the OASIS dataset. Each image is resized to 
+                        224×224 pixels and converted to RGB format. Images are organized into 4 classes based 
+                        on Alzheimer's severity.
+                    </p>
+                    <div class="row g-2 mt-3">
+                        <div class="col-3"><div class="mini-badge bg-success-subtle text-success">Non Demented: 67,222</div></div>
+                        <div class="col-3"><div class="mini-badge bg-warning-subtle text-warning">Very Mild: 13,725</div></div>
+                        <div class="col-3"><div class="mini-badge" style="background: rgba(230,126,34,0.15); color: #e67e22;">Mild: 5,002</div></div>
+                        <div class="col-3"><div class="mini-badge bg-danger-subtle text-danger">Moderate: 488</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="pipeline-step" data-animate="fadeInRight">
+                <div class="step-connector"></div>
+                <div class="step-marker">
+                    <div class="step-marker-inner">2</div>
+                </div>
+                <div class="step-content glass-card">
+                    <div class="step-badge">Data Cleaning</div>
+                    <h4><i class="bi bi-funnel me-2 text-accent"></i>Quality Assurance</h4>
+                    <p class="text-muted">
+                        Removed corrupted and unreadable images using OpenCV validation. Filtered out non-image files 
+                        and performed MD5 hash-based deduplication to eliminate duplicate scans. Pixel values 
+                        normalized to [0, 1] range.
+                    </p>
+                    <div class="code-snippet mt-3">
+                        <code>
+                            ✓ Corruption check via cv2.imread<br>
+                            ✓ Extension filter (jpg, jpeg, png)<br>
+                            ✓ MD5 hash deduplication<br>
+                            ✓ Pixel normalization → [0, 1]
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="pipeline-step" data-animate="fadeInLeft">
+                <div class="step-connector"></div>
+                <div class="step-marker">
+                    <div class="step-marker-inner">3</div>
+                </div>
+                <div class="step-content glass-card">
+                    <div class="step-badge">Data Splitting</div>
+                    <h4><i class="bi bi-pie-chart me-2 text-accent"></i>Stratified Train/Val/Test Split</h4>
+                    <p class="text-muted">
+                        Data split into 70% training, 15% validation, and 15% testing sets using stratified 
+                        splitting to preserve class ratios across all sets. This ensures each split has 
+                        proportional representation of all 4 classes.
+                    </p>
+                    <div class="split-visual mt-3">
+                        <div class="split-bar">
+                            <div class="split-segment train" style="width: 70%;">Train 70%</div>
+                            <div class="split-segment val" style="width: 15%;">Val 15%</div>
+                            <div class="split-segment test" style="width: 15%;">Test 15%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="pipeline-step" data-animate="fadeInRight">
+                <div class="step-connector"></div>
+                <div class="step-marker">
+                    <div class="step-marker-inner">4</div>
+                </div>
+                <div class="step-content glass-card">
+                    <div class="step-badge">Data Balancing</div>
+                    <h4><i class="bi bi-balance-scale me-2 text-accent"></i>Handling Class Imbalance</h4>
+                    <p class="text-muted">
+                        Applied class weighting (sklearn's compute_class_weight) to give higher importance to 
+                        minority classes during training. Additionally, real-time data augmentation is applied 
+                        including rotation, flipping, zoom, and shift transformations.
+                    </p>
+                    <div class="code-snippet mt-3">
+                        <code>
+                            ImageDataGenerator(<br>
+                            &nbsp;&nbsp;rotation_range=20,<br>
+                            &nbsp;&nbsp;horizontal_flip=True,<br>
+                            &nbsp;&nbsp;zoom_range=0.15,<br>
+                            &nbsp;&nbsp;width_shift_range=0.1,<br>
+                            &nbsp;&nbsp;height_shift_range=0.1<br>
+                            )
+                        </code>
+                    </div>
+                    {% if plot_files.get('class_distribution.png') %}
+                    <div class="mt-3">
+                        <img src="{{ plot_files['class_distribution.png'] }}" class="img-fluid rounded" alt="Class Distribution">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="pipeline-step" data-animate="fadeInLeft">
+                <div class="step-connector"></div>
+                <div class="step-marker">
+                    <div class="step-marker-inner">5</div>
+                </div>
+                <div class="step-content glass-card">
+                    <div class="step-badge">Model Training</div>
+                    <h4><i class="bi bi-cpu me-2 text-accent"></i>6 Deep Learning Models</h4>
+                    <p class="text-muted">
+                        Trained 6 different neural network architectures. Most were trained for 20 epochs using feature extraction with the Adam optimizer. The MobileNetV2 model was specifically fine-tuned by unfreezing its top 30 layers and trained with a lower learning rate (1e-4) for optimized performance. EarlyStopping and ReduceLROnPlateau callbacks ensure optimal training.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Model Architectures -->
+<section class="section-padding bg-darker">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Model <span class="gradient-text">Architectures</span></h2>
+        </div>
+
+        <div class="row g-4">
+            <!-- CNN -->
+            <div class="col-md-6 col-lg-4">
+                <div class="model-card glass-card h-100">
+                    <div class="model-card-header">
+                        <div class="model-icon"><i class="bi bi-grid-3x3-gap"></i></div>
+                        <h5>Custom CNN</h5>
+                        <span class="model-tag">Built from Scratch</span>
+                    </div>
+                    <div class="model-architecture">
+                        <div class="arch-layer">Conv2D(32) → MaxPool</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">Conv2D(64) → MaxPool</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">Conv2D(128) → MaxPool</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">BatchNorm → Dropout</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer output">Dense(4, softmax)</div>
+                    </div>
+                    {% if plot_files.get('cnn_accuracy.png') %}
+                    <img src="{{ plot_files['cnn_accuracy.png'] }}" class="img-fluid rounded mt-3" alt="CNN Accuracy">
+                    {% endif %}
+                    {% if plot_files.get('cnn_confusion_matrix.png') %}
+                    <img src="{{ plot_files['cnn_confusion_matrix.png'] }}" class="img-fluid rounded mt-2" alt="CNN Confusion Matrix">
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- MLP -->
+            <div class="col-md-6 col-lg-4">
+                <div class="model-card glass-card h-100">
+                    <div class="model-card-header">
+                        <div class="model-icon"><i class="bi bi-diagram-2"></i></div>
+                        <h5>MLP</h5>
+                        <span class="model-tag">Multi-Layer Perceptron</span>
+                    </div>
+                    <div class="model-architecture">
+                        <div class="arch-layer">Flatten(224×224×3)</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">Dense(512) → BatchNorm</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">Dense(256) → Dropout</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer output">Dense(4, softmax)</div>
+                    </div>
+                    {% if plot_files.get('mlp_accuracy.png') %}
+                    <img src="{{ plot_files['mlp_accuracy.png'] }}" class="img-fluid rounded mt-3" alt="MLP Accuracy">
+                    {% endif %}
+                    {% if plot_files.get('mlp_confusion_matrix.png') %}
+                    <img src="{{ plot_files['mlp_confusion_matrix.png'] }}" class="img-fluid rounded mt-2" alt="MLP Confusion Matrix">
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- VGG16 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="model-card glass-card h-100">
+                    <div class="model-card-header">
+                        <div class="model-icon"><i class="bi bi-stack"></i></div>
+                        <h5>VGG16</h5>
+                        <span class="model-tag">Transfer Learning</span>
+                    </div>
+                    <div class="model-architecture">
+                        <div class="arch-layer">VGG16 (ImageNet)</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">GlobalAvgPool2D</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">Dense(256) → Dropout</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer output">Dense(4, softmax)</div>
+                    </div>
+                    {% if plot_files.get('vgg16_accuracy.png') %}
+                    <img src="{{ plot_files['vgg16_accuracy.png'] }}" class="img-fluid rounded mt-3" alt="VGG16 Accuracy">
+                    {% endif %}
+                    {% if plot_files.get('vgg16_confusion_matrix.png') %}
+                    <img src="{{ plot_files['vgg16_confusion_matrix.png'] }}" class="img-fluid rounded mt-2" alt="VGG16 Confusion Matrix">
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ResNet50 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="model-card glass-card h-100">
+                    <div class="model-card-header">
+                        <div class="model-icon"><i class="bi bi-bezier2"></i></div>
+                        <h5>ResNet50</h5>
+                        <span class="model-tag">Transfer Learning</span>
+                    </div>
+                    <div class="model-architecture">
+                        <div class="arch-layer">ResNet50 (ImageNet)</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">GlobalAvgPool2D</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">Dense(256) → Dropout</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer output">Dense(4, softmax)</div>
+                    </div>
+                    {% if plot_files.get('resnet50_accuracy.png') %}
+                    <img src="{{ plot_files['resnet50_accuracy.png'] }}" class="img-fluid rounded mt-3" alt="ResNet50 Accuracy">
+                    {% endif %}
+                    {% if plot_files.get('resnet50_confusion_matrix.png') %}
+                    <img src="{{ plot_files['resnet50_confusion_matrix.png'] }}" class="img-fluid rounded mt-2" alt="ResNet50 Confusion Matrix">
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- EfficientNetB0 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="model-card glass-card h-100">
+                    <div class="model-card-header">
+                        <div class="model-icon"><i class="bi bi-lightning-charge"></i></div>
+                        <h5>EfficientNetB0</h5>
+                        <span class="model-tag">Transfer Learning</span>
+                    </div>
+                    <div class="model-architecture">
+                        <div class="arch-layer">EfficientNetB0 (ImageNet)</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">GlobalAvgPool2D</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">Dense(256) → Dropout</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer output">Dense(4, softmax)</div>
+                    </div>
+                    {% if plot_files.get('efficientnet_accuracy.png') %}
+                    <img src="{{ plot_files['efficientnet_accuracy.png'] }}" class="img-fluid rounded mt-3" alt="EfficientNet Accuracy">
+                    {% endif %}
+                    {% if plot_files.get('efficientnet_confusion_matrix.png') %}
+                    <img src="{{ plot_files['efficientnet_confusion_matrix.png'] }}" class="img-fluid rounded mt-2" alt="EfficientNet Confusion Matrix">
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- MobileNetV2 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="model-card glass-card h-100">
+                    <div class="model-card-header">
+                        <div class="model-icon"><i class="bi bi-phone"></i></div>
+                        <h5>MobileNetV2</h5>
+                        <span class="model-tag text-bg-warning">Fine-Tuned Transfer</span>
+                    </div>
+                    <div class="model-architecture">
+                        <div class="arch-layer">MobileNetV2 (Unfroze Top 30 Layers)</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">GlobalAvgPool2D</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer">Dense(256) → Dropout(0.5)</div>
+                        <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                        <div class="arch-layer output">Dense(4, softmax)</div>
+                    </div>
+                    {% if plot_files.get('mobilenet_accuracy.png') %}
+                    <img src="{{ plot_files['mobilenet_accuracy.png'] }}" class="img-fluid rounded mt-3" alt="MobileNet Accuracy">
+                    {% endif %}
+                    {% if plot_files.get('mobilenet_confusion_matrix.png') %}
+                    <img src="{{ plot_files['mobilenet_confusion_matrix.png'] }}" class="img-fluid rounded mt-2" alt="MobileNet Confusion Matrix">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Step 6: Evaluation -->
+<section class="section-padding">
+    <div class="container">
+        <div class="pipeline-step" data-animate="fadeInUp">
+            <div class="step-content glass-card text-center">
+                <div class="step-badge">Evaluation & Deployment</div>
+                <h4><i class="bi bi-trophy me-2 text-accent"></i>Model Comparison & Best Model Selection</h4>
+                <p class="text-muted">
+                    All 6 models are evaluated on the held-out test set using accuracy, F1-score, precision, 
+                    and recall. The best-performing model is selected and deployed in this web application 
+                    for real-time predictions.
+                </p>
+                {% if plot_files.get('model_comparison.png') %}
+                <div class="mt-4">
+                    <img src="{{ plot_files['model_comparison.png'] }}" class="img-fluid rounded" alt="Model Comparison">
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

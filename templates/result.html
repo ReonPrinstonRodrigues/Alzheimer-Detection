@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block title %}Result{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1 class="page-title">Analysis <span class="gradient-text">Results</span></h1>
+        <p class="page-subtitle">AI-powered Alzheimer's disease classification result</p>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <!-- Result Card -->
+            <div class="col-lg-8">
+                <div class="result-card glass-card" data-animate="fadeInUp" 
+                     style="border-top: 4px solid {{ result.color }};">
+                    
+                    <!-- Header -->
+                    <div class="result-header text-center mb-4">
+                        <div class="result-icon-wrap" style="background: {{ result.color }}20; color: {{ result.color }};">
+                            <i class="bi bi-{% if result.badge_class == 'success' %}check-circle{% elif result.badge_class == 'warning' %}exclamation-circle{% elif result.badge_class == 'orange' %}exclamation-triangle{% else %}exclamation-octagon{% endif %} fs-1"></i>
+                        </div>
+                        <h2 class="mt-3 mb-1" style="color: {{ result.color }};">{{ result.predicted_class }}</h2>
+                        <span class="badge rounded-pill fs-6" 
+                              style="background: {{ result.color }}20; color: {{ result.color }}; border: 1px solid {{ result.color }}40;">
+                            {{ result.severity }}
+                        </span>
+                    </div>
+
+                    <!-- Confidence -->
+                    <div class="result-section mb-4">
+                        <h6 class="result-section-title"><i class="bi bi-speedometer2 me-2"></i>Confidence Score</h6>
+                        <div class="confidence-display">
+                            <div class="confidence-value" style="color: {{ result.color }};">{{ result.confidence }}%</div>
+                            <div class="progress confidence-bar">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ result.confidence }}%; background: {{ result.color }};"
+                                     data-animate-width="{{ result.confidence }}%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- All Probabilities -->
+                    <div class="result-section mb-4">
+                        <h6 class="result-section-title"><i class="bi bi-bar-chart me-2"></i>Class Probabilities</h6>
+                        <div class="probabilities-grid">
+                            {% for class_name, prob in result.all_probabilities.items() %}
+                            <div class="prob-item">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="small">{{ class_name }}</span>
+                                    <span class="small fw-semibold">{{ prob }}%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar" role="progressbar" 
+                                         style="width: {{ prob }}%; background: {% if class_name == 'Non Demented' %}#2ecc71{% elif class_name == 'Very Mild Demented' %}#f39c12{% elif class_name == 'Mild Demented' %}#e67e22{% else %}#e74c3c{% endif %};">
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Model Used -->
+                    <div class="result-section mb-4">
+                        <h6 class="result-section-title"><i class="bi bi-cpu me-2"></i>Model Used</h6>
+                        <p class="text-muted mb-0">{{ result.model_used }}</p>
+                    </div>
+
+                    <!-- Uploaded Image -->
+                    <div class="result-section mb-4">
+                        <h6 class="result-section-title"><i class="bi bi-image me-2"></i>Uploaded MRI Scan</h6>
+                        <div class="result-image-wrap">
+                            <img src="{{ result.image_url }}" alt="Uploaded MRI" class="result-image">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clinical Info Sidebar -->
+            <div class="col-lg-4">
+                <!-- Disclaimer -->
+                <div class="clinical-card glass-card mb-4" data-animate="fadeInUp" data-delay="300" 
+                     style="border-left: 3px solid #f39c12;">
+                    <div class="clinical-card-header">
+                        <i class="bi bi-exclamation-triangle me-2 text-warning"></i>
+                        <h6 class="mb-0">Important Notice</h6>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        This result is generated by an AI model for educational purposes only. It should NOT be 
+                        used as a medical diagnosis. Please consult a qualified neurologist or healthcare 
+                        professional for proper medical advice and diagnosis.
+                    </p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-4 d-grid gap-2">
+                    <a href="{{ url_for('download_report') }}" class="btn btn-accent" id="downloadReportBtn">
+                        <i class="bi bi-file-earmark-pdf me-2"></i>Download PDF Report
+                    </a>
+                    <a href="{{ url_for('predict') }}" class="btn btn-outline-accent">
+                        <i class="bi bi-arrow-repeat me-2"></i>Analyze Another Scan
+                    </a>
+                    <a href="{{ url_for('methodology') }}" class="btn btn-outline-light">
+                        <i class="bi bi-journal-code me-2"></i>View Methodology
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Clinical Info Row -->
+        <div class="row g-4 justify-content-center mt-2">
+            <!-- Cause Card -->
+            <div class="col-lg-6">
+                <div class="clinical-card glass-card h-100" data-animate="fadeInUp" data-delay="100">
+                    <div class="clinical-card-header">
+                        <i class="bi bi-search me-2" style="color: {{ result.color }};"></i>
+                        <h6 class="mb-0">Possible Cause</h6>
+                    </div>
+                    <div>{{ result.cause | safe }}</div>
+                </div>
+            </div>
+
+            <!-- Treatment Card -->
+            <div class="col-lg-6">
+                <div class="clinical-card glass-card h-100" data-animate="fadeInUp" data-delay="200">
+                    <div class="clinical-card-header">
+                        <i class="bi bi-capsule me-2" style="color: {{ result.color }};"></i>
+                        <h6 class="mb-0">Treatment Suggestions</h6>
+                    </div>
+                    <div>{{ result.treatment | safe }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

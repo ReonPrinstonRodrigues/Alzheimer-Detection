@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Predict{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1 class="page-title">MRI <span class="gradient-text">Analysis</span></h1>
+        <p class="page-subtitle">Upload a brain MRI scan to get an AI-powered Alzheimer's disease classification.</p>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="predict-card glass-card" data-animate="fadeInUp">
+                    <form method="POST" action="{{ url_for('predict') }}" enctype="multipart/form-data" id="predictForm">
+                        
+                        <!-- Upload Area -->
+                        <div class="upload-zone" id="uploadZone">
+                            <input type="file" class="upload-input" id="mri_image" name="mri_image" 
+                                   accept=".jpg,.jpeg,.png" required>
+                            <div class="upload-content" id="uploadContent">
+                                <div class="upload-icon">
+                                    <i class="bi bi-cloud-arrow-up"></i>
+                                </div>
+                                <h5>Upload MRI Brain Scan</h5>
+                                <p class="text-muted mb-2">Drag & drop your image here or click to browse</p>
+                                <span class="upload-hint">Supported: JPG, JPEG, PNG (Max 16MB)</span>
+                            </div>
+                            <div class="upload-preview" id="uploadPreview" style="display:none;">
+                                <img id="previewImage" src="" alt="Preview">
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-preview" id="removePreview">
+                                    <i class="bi bi-x-lg"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Active Model Info -->
+                        <div class="model-info-section mt-4">
+                            <div class="alert d-flex align-items-center mb-0" role="alert" style="background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem;">
+                                <div class="model-icon-wrapper" style="width: 48px; height: 48px; border-radius: 10px; background: rgba(14, 165, 233, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                                    <i class="bi bi-cpu text-accent fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <h6 class="mb-0 fw-semibold me-2">AI Model: MobileNetV2</h6>
+                                        <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.7rem; font-weight: 500;">Active</span>
+                                    </div>
+                                    <p class="mb-0 small text-muted">Optimized neural network for high-accuracy and rapid pattern recognition.</p>
+                                </div>
+                            </div>
+                            <input type="hidden" name="model_select" value="mobilenet">
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-accent btn-lg w-100" id="predictBtn">
+                                <i class="bi bi-search me-2"></i>Analyze MRI Scan
+                                <span class="spinner-border spinner-border-sm ms-2 d-none" id="predictSpinner"></span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Info Note -->
+                    <div class="predict-note mt-4">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-info-circle text-accent me-2 mt-1"></i>
+                            <p class="small text-muted mb-0">
+                                <strong>Disclaimer:</strong> This tool is for educational and research purposes only. 
+                                Results should not be used as a substitute for professional medical diagnosis. Always 
+                                consult a qualified healthcare professional for medical advice.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

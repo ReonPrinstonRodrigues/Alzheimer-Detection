@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" id="heroSection">
+    <div class="hero-particles" id="particles"></div>
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-7">
+                <div class="hero-content" data-animate="fadeInUp">
+                    <div class="hero-badge mb-3">
+                        <i class="bi bi-shield-check me-1"></i>
+                        AI-Powered Medical Imaging
+                    </div>
+                    <h1 class="hero-title">
+                        Early Detection of<br>
+                        <span class="gradient-text">Alzheimer's Disease</span><br>
+                        Using MRI Scans
+                    </h1>
+                    <p class="hero-subtitle">
+                        Leveraging state-of-the-art deep learning models trained on the OASIS Brain MRI dataset 
+                        to classify Alzheimer's disease severity with high accuracy. Upload a brain scan and 
+                        get instant AI-powered analysis.
+                    </p>
+                    <div class="hero-actions">
+                        {% if session.get('user_id') %}
+                        <a href="{{ url_for('predict') }}" class="btn btn-accent btn-lg me-3">
+                            <i class="bi bi-upload me-2"></i>Analyze MRI Scan
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('register') }}" class="btn btn-accent btn-lg me-3">
+                            <i class="bi bi-rocket-takeoff me-2"></i>Get Started
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('methodology') }}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-journal-code me-2"></i>View Methodology
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="hero-visual">
+                    <img src="{{ url_for('static', filename='img/hero.png') }}" alt="AI Neural Network" class="img-fluid rounded-4 shadow-lg hero-image">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hero-wave">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+            <path d="M0,60 C360,120 1080,0 1440,60 L1440,120 L0,120 Z" fill="var(--bg-primary)"/>
+        </svg>
+    </div>
+</section>
+
+<!-- About Alzheimer's Section -->
+<section class="section-padding" id="aboutAlzheimers">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Understanding <span class="gradient-text">Alzheimer's Disease</span></h2>
+            <p class="section-subtitle">
+                Alzheimer's disease is a progressive neurological disorder that causes brain cells to degenerate and die, 
+                leading to a continuous decline in thinking, behavioral, and social skills.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="severity-card severity-normal" data-animate="fadeInUp" data-delay="0">
+                    <div class="severity-icon">
+                        <i class="bi bi-emoji-smile"></i>
+                    </div>
+                    <h5>Non Demented</h5>
+                    <div class="severity-bar">
+                        <div class="severity-fill" style="width: 5%; background: #2ecc71;"></div>
+                    </div>
+                    <p class="small text-muted">Normal cognitive function. No detectable signs of dementia in brain scans.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="severity-card severity-very-mild" data-animate="fadeInUp" data-delay="100">
+                    <div class="severity-icon">
+                        <i class="bi bi-exclamation-circle"></i>
+                    </div>
+                    <h5>Very Mild</h5>
+                    <div class="severity-bar">
+                        <div class="severity-fill" style="width: 35%; background: #f39c12;"></div>
+                    </div>
+                    <p class="small text-muted">Early memory lapses. Subtle cognitive changes that may go unnoticed.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="severity-card severity-mild" data-animate="fadeInUp" data-delay="200">
+                    <div class="severity-icon">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <h5>Mild</h5>
+                    <div class="severity-bar">
+                        <div class="severity-fill" style="width: 65%; background: #e67e22;"></div>
+                    </div>
+                    <p class="small text-muted">Noticeable memory loss. Difficulty with daily tasks and planning.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="severity-card severity-moderate" data-animate="fadeInUp" data-delay="300">
+                    <div class="severity-icon">
+                        <i class="bi bi-exclamation-octagon"></i>
+                    </div>
+                    <h5>Moderate</h5>
+                    <div class="severity-bar">
+                        <div class="severity-fill" style="width: 90%; background: #e74c3c;"></div>
+                    </div>
+                    <p class="small text-muted">Significant decline. Requires full-time care and specialist treatment.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="stats-section" id="statsSection">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-6 col-lg-3">
+                <div class="stat-card" data-animate="fadeInUp">
+                    <div class="stat-icon"><i class="bi bi-layers"></i></div>
+                    <div class="stat-number" data-count="{{ stats.classes }}">0</div>
+                    <div class="stat-label">Disease Classes</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card" data-animate="fadeInUp" data-delay="100">
+                    <div class="stat-icon"><i class="bi bi-images"></i></div>
+                    <div class="stat-number" data-count="86437" data-suffix="">0</div>
+                    <div class="stat-label">MRI Scans</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card" data-animate="fadeInUp" data-delay="200">
+                    <div class="stat-icon"><i class="bi bi-cpu"></i></div>
+                    <div class="stat-number" data-count="{{ stats.models_trained }}">0</div>
+                    <div class="stat-label">AI Models</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card" data-animate="fadeInUp" data-delay="300">
+                    <div class="stat-icon"><i class="bi bi-bullseye"></i></div>
+                    <div class="stat-number" data-count="95" data-suffix="%+">0</div>
+                    <div class="stat-label">Best Accuracy</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="section-padding" id="howItWorks">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">How It <span class="gradient-text">Works</span></h2>
+            <p class="section-subtitle">Three simple steps to get AI-powered Alzheimer's analysis</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="step-card" data-animate="fadeInUp">
+                    <div class="step-number">01</div>
+                    <div class="step-icon"><i class="bi bi-person-plus"></i></div>
+                    <h5>Create Account</h5>
+                    <p class="text-muted">Sign up for a free account to access the prediction system.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card" data-animate="fadeInUp" data-delay="150">
+                    <div class="step-number">02</div>
+                    <div class="step-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                    <h5>Upload MRI Scan</h5>
+                    <p class="text-muted">Upload a brain MRI scan image and select your preferred AI model.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card" data-animate="fadeInUp" data-delay="300">
+                    <div class="step-number">03</div>
+                    <div class="step-icon"><i class="bi bi-clipboard2-pulse"></i></div>
+                    <h5>Get Results</h5>
+                    <p class="text-muted">Receive instant classification with confidence scores and clinical insights.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

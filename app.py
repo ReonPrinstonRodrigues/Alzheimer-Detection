@@ -717,10 +717,27 @@ def initialize_app():
 initialize_app()
 
 
+# ─── Background Model Preloader ──────────────────────────────
+
+def _preload_model_background():
+    """Preload model in a background thread so first prediction is fast."""
+    import time
+    time.sleep(2)  # Wait for server to bind to port first
+    default_model = os.path.join(MODELS_DIR, 'mobilenet_model.h5')
+    if os.path.exists(default_model):
+        print("  [Background] Preloading MobileNetV2 model...")
+        get_cached_model(default_model)
+        print("  [Background] Model ready for instant predictions!")
+
+
+import threading
+_preload_thread = threading.Thread(target=_preload_model_background, daemon=True)
+_preload_thread.start()
+
+
 # ─── Main ─────────────────────────────────────────────────────
 
 if __name__ == '__main__':
-    # Run the application — model loads lazily on first prediction via get_cached_model()
     port = int(os.environ.get('PORT', 5050))
     debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
     print("=" * 60)

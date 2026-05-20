@@ -405,7 +405,8 @@ def download_report():
                 self.cell(0, 8, 'NeuroScan AI  |  Alzheimer\'s Disease Detection Report', 0, 1, 'C')
                 self.set_draw_color(167, 139, 250)
                 self.set_line_width(0.5)
-                self.line(10, 14, 200, 14)
+                y = self.get_y() + 1
+                self.line(10, y, 200, y)
                 self.ln(6)
 
             def footer(self):

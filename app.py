@@ -585,8 +585,10 @@ if __name__ == '__main__':
         print("  Model ready for instant predictions!")
 
     # Run the application
+    port = int(os.environ.get('PORT', 5050))
+    debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
     print("=" * 60)
     print("  Alzheimer's Disease Detection System")
-    print("  Running on http://localhost:5050")
+    print(f"  Running on http://localhost:{port}")
     print("=" * 60)
-    app.run(debug=True, port=5050, host='0.0.0.0')
+    app.run(debug=debug, port=port, host='0.0.0.0')

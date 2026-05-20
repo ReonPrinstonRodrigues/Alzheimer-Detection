@@ -584,14 +584,7 @@ initialize_app()
 # ─── Main ─────────────────────────────────────────────────────
 
 if __name__ == '__main__':
-    # Preload the default model at startup so first prediction is fast
-    default_model = os.path.join(MODELS_DIR, 'mobilenet_model.h5')
-    if os.path.exists(default_model):
-        print("  Preloading MobileNetV2 model...")
-        get_cached_model(default_model)
-        print("  Model ready for instant predictions!")
-
-    # Run the application
+    # Run the application — model loads lazily on first prediction via get_cached_model()
     port = int(os.environ.get('PORT', 5050))
     debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
     print("=" * 60)

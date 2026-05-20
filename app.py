@@ -8,6 +8,7 @@ import os
 # Suppress TensorFlow verbose logging (must be before TF import)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # Force CPU-only (saves memory)
 
 import re
 import io
@@ -566,17 +567,23 @@ def internal_error(e):
     return render_template('base.html', error='Internal server error'), 500
 
 
-# ─── Main ─────────────────────────────────────────────────────
+# ─── App Initialization ───────────────────────────────────────
 
-if __name__ == '__main__':
-    # Create required directories
+def initialize_app():
+    """Initialize directories and database (called on startup)."""
     os.makedirs('static/uploads', exist_ok=True)
     os.makedirs('models', exist_ok=True)
     os.makedirs('plots', exist_ok=True)
-
-    # Initialize database
     init_db()
 
+
+# Always initialize on import (works for both gunicorn and direct run)
+initialize_app()
+
+
+# ─── Main ─────────────────────────────────────────────────────
+
+if __name__ == '__main__':
     # Preload the default model at startup so first prediction is fast
     default_model = os.path.join(MODELS_DIR, 'mobilenet_model.h5')
     if os.path.exists(default_model):

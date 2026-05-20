@@ -398,137 +398,272 @@ def download_report():
             return redirect(url_for('predict'))
 
         class ReportPDF(FPDF):
-            """Custom PDF with header and footer."""
+            """Custom PDF with premium medical report styling."""
+
+            # Color palette
+            PRIMARY = (88, 60, 210)       # Deep purple
+            PRIMARY_LIGHT = (167, 139, 250)  # Light purple
+            ACCENT = (45, 198, 140)       # Teal green
+            DARK = (30, 30, 45)           # Near-black
+            TEXT = (55, 55, 70)           # Body text
+            TEXT_LIGHT = (120, 120, 135)  # Muted text
+            BG_LIGHT = (245, 245, 252)   # Light background
+            WHITE = (255, 255, 255)
+            BORDER = (220, 220, 230)
+
+            SEVERITY_COLORS = {
+                'Non Demented': (46, 204, 113),
+                'Very Mild Demented': (243, 156, 18),
+                'Mild Demented': (230, 126, 34),
+                'Moderate Demented': (231, 76, 60),
+            }
+
             def header(self):
-                self.set_font('Helvetica', 'B', 10)
-                self.set_text_color(100, 100, 100)
-                self.cell(0, 8, 'NeuroScan AI  |  Alzheimer\'s Disease Detection Report', 0, 1, 'C')
-                self.set_draw_color(167, 139, 250)
-                self.set_line_width(0.5)
-                y = self.get_y() + 1
-                self.line(10, y, 200, y)
-                self.ln(6)
+                # Purple header banner
+                self.set_fill_color(*self.PRIMARY)
+                self.rect(0, 0, 210, 18, 'F')
+                # Accent stripe
+                self.set_fill_color(*self.ACCENT)
+                self.rect(0, 18, 210, 1.5, 'F')
+
+                # Header text on banner
+                self.set_y(4)
+                self.set_font('Helvetica', 'B', 11)
+                self.set_text_color(*self.WHITE)
+                self.cell(0, 5, 'NeuroScan AI', 0, 0, 'L')
+                self.set_font('Helvetica', '', 9)
+                self.cell(0, 5, 'Alzheimer\'s Disease Detection Report', 0, 1, 'R')
+
+                self.set_y(10)
+                self.set_font('Helvetica', '', 7)
+                self.set_text_color(200, 200, 220)
+                self.cell(0, 5, 'AI-Powered Medical Imaging Analysis', 0, 1, 'L')
+
+                self.set_y(24)
 
             def footer(self):
-                self.set_y(-15)
-                self.set_font('Helvetica', 'I', 8)
-                self.set_text_color(150, 150, 150)
-                self.cell(0, 10,
-                    f'Generated on {result["timestamp"]}  |  Page {self.page_no()}/{{nb}}  |  For Educational Purposes Only',
-                    0, 0, 'C')
-
-            def section_title(self, title, r=60, g=60, b=60):
-                self.set_font('Helvetica', 'B', 13)
-                self.set_text_color(r, g, b)
-                self.cell(0, 10, title, 0, 1, 'L')
-                self.set_draw_color(200, 200, 200)
+                self.set_y(-18)
+                # Footer line
+                self.set_draw_color(*self.BORDER)
+                self.set_line_width(0.3)
                 self.line(10, self.get_y(), 200, self.get_y())
-                self.ln(3)
+                self.ln(2)
+                self.set_font('Helvetica', '', 7)
+                self.set_text_color(*self.TEXT_LIGHT)
+                self.cell(95, 5, f'Report generated: {result["timestamp"]}', 0, 0, 'L')
+                self.cell(95, 5, f'Page {self.page_no()}/{{nb}}', 0, 1, 'R')
+                self.set_font('Helvetica', 'I', 6)
+                self.cell(0, 4, 'This report is for educational purposes only and does not constitute medical advice.', 0, 0, 'C')
 
-            def key_value(self, key, value):
-                self.set_font('Helvetica', 'B', 10)
-                self.set_text_color(80, 80, 80)
-                self.cell(55, 7, key + ':', 0, 0)
-                self.set_font('Helvetica', '', 10)
-                self.set_text_color(40, 40, 40)
-                self.cell(0, 7, str(value), 0, 1)
+            def colored_section(self, title, icon_char='>', r=None, g=None, b=None):
+                """Section header with colored left accent bar."""
+                color = (r, g, b) if r is not None else self.PRIMARY
+                # Left accent bar
+                self.set_fill_color(*color)
+                y_start = self.get_y()
+                self.rect(10, y_start, 2.5, 9, 'F')
+                # Title text
+                self.set_x(16)
+                self.set_font('Helvetica', 'B', 12)
+                self.set_text_color(*self.DARK)
+                self.cell(0, 9, f'  {title}', 0, 1, 'L')
+                self.ln(2)
 
-            def bullet_point(self, text):
+            def info_row(self, label, value, bold_value=False):
+                """Key-value row with label and value."""
+                self.set_x(18)
                 self.set_font('Helvetica', '', 9)
-                self.set_text_color(60, 60, 60)
-                # Split bold heading from description
+                self.set_text_color(*self.TEXT_LIGHT)
+                self.cell(45, 6, label, 0, 0)
+                self.set_text_color(*self.DARK)
+                self.set_font('Helvetica', 'B' if bold_value else '', 9)
+                self.cell(0, 6, str(value), 0, 1)
+
+            def detail_block(self, text):
+                """Bullet point with bold heading and description."""
+                self.set_x(18)
+                self.set_font('Helvetica', '', 8.5)
+                self.set_text_color(*self.TEXT)
                 parts = text.split(':', 1)
-                x = self.get_x()
-                self.cell(5, 5, '-', 0, 0)  # bullet point
                 if len(parts) == 2 and len(parts[0]) < 60:
-                    self.set_font('Helvetica', 'B', 9)
-                    self.cell(0, 5, parts[0].strip() + ':', 0, 1)
-                    self.set_x(x + 5)
-                    self.set_font('Helvetica', '', 9)
-                    self.multi_cell(175, 5, parts[1].strip())
+                    # Bullet marker
+                    self.set_fill_color(*self.PRIMARY_LIGHT)
+                    self.rect(self.get_x(), self.get_y() + 1.5, 2, 2, 'F')
+                    self.set_x(23)
+                    self.set_font('Helvetica', 'B', 8.5)
+                    self.set_text_color(*self.DARK)
+                    self.cell(0, 5, parts[0].strip(), 0, 1)
+                    self.set_x(23)
+                    self.set_font('Helvetica', '', 8.5)
+                    self.set_text_color(*self.TEXT)
+                    self.multi_cell(170, 4.5, parts[1].strip())
                 else:
-                    self.multi_cell(180, 5, text)
-                self.ln(1)
+                    self.set_fill_color(*self.PRIMARY_LIGHT)
+                    self.rect(self.get_x(), self.get_y() + 1.5, 2, 2, 'F')
+                    self.set_x(23)
+                    self.multi_cell(170, 4.5, text)
+                self.ln(2)
 
         pdf = ReportPDF()
         pdf.alias_nb_pages()
-        pdf.set_auto_page_break(auto=True, margin=20)
+        pdf.set_auto_page_break(auto=True, margin=22)
         pdf.add_page()
 
-        # ── Title ──
-        pdf.set_font('Helvetica', 'B', 22)
-        pdf.set_text_color(50, 50, 50)
-        pdf.cell(0, 12, 'Detection Report', 0, 1, 'C')
-        pdf.set_font('Helvetica', '', 11)
-        pdf.set_text_color(120, 120, 120)
-        pdf.cell(0, 7, 'Alzheimer\'s Disease MRI Classification Result', 0, 1, 'C')
-        pdf.ln(8)
+        # ── Report Title ──
+        pdf.set_font('Helvetica', 'B', 20)
+        pdf.set_text_color(*ReportPDF.DARK)
+        pdf.cell(0, 10, 'Diagnostic Analysis Report', 0, 1, 'C')
+        pdf.set_font('Helvetica', '', 10)
+        pdf.set_text_color(*ReportPDF.TEXT_LIGHT)
+        pdf.cell(0, 6, 'MRI-Based Alzheimer\'s Disease Classification', 0, 1, 'C')
+        pdf.ln(6)
 
-        # ── Patient / Session Info ──
-        pdf.section_title('Patient Information')
-        pdf.key_value('Patient Name', result.get('patient_name', 'N/A'))
-        pdf.key_value('Date & Time', result['timestamp'])
-        pdf.key_value('Model Used', result['model_used'])
-        pdf.ln(5)
+        # ── Diagnosis Result Card (prominent box at top) ──
+        sev_color = ReportPDF.SEVERITY_COLORS.get(result['predicted_class'], (100, 100, 100))
+        card_y = pdf.get_y()
+        # Card background
+        pdf.set_fill_color(*ReportPDF.BG_LIGHT)
+        pdf.set_draw_color(*ReportPDF.BORDER)
+        pdf.set_line_width(0.3)
+        pdf.rect(10, card_y, 190, 32, 'DF')
+        # Severity color stripe on left
+        pdf.set_fill_color(*sev_color)
+        pdf.rect(10, card_y, 3, 32, 'F')
 
-        # ── MRI Image ──
+        # Diagnosis text inside card
+        pdf.set_xy(18, card_y + 3)
+        pdf.set_font('Helvetica', '', 8)
+        pdf.set_text_color(*ReportPDF.TEXT_LIGHT)
+        pdf.cell(80, 5, 'DIAGNOSIS', 0, 0, 'L')
+        pdf.cell(50, 5, 'SEVERITY', 0, 0, 'L')
+        pdf.cell(0, 5, 'CONFIDENCE', 0, 1, 'L')
+
+        pdf.set_x(18)
+        pdf.set_font('Helvetica', 'B', 14)
+        pdf.set_text_color(*sev_color)
+        pdf.cell(80, 8, result['predicted_class'], 0, 0, 'L')
+        pdf.set_font('Helvetica', 'B', 10)
+        pdf.set_text_color(*ReportPDF.DARK)
+        pdf.cell(50, 8, result['severity'], 0, 0, 'L')
+        pdf.set_font('Helvetica', 'B', 14)
+        pdf.set_text_color(*sev_color)
+        pdf.cell(0, 8, f"{result['confidence']}%", 0, 1, 'L')
+
+        # Confidence bar
+        pdf.set_x(18)
+        bar_y = pdf.get_y() + 2
+        bar_width = 175
+        # Background bar
+        pdf.set_fill_color(220, 220, 230)
+        pdf.rect(18, bar_y, bar_width, 4, 'F')
+        # Filled bar
+        pdf.set_fill_color(*sev_color)
+        fill_width = bar_width * (result['confidence'] / 100)
+        pdf.rect(18, bar_y, fill_width, 4, 'F')
+
+        pdf.set_y(card_y + 36)
+
+        # ── Patient Information ──
+        pdf.colored_section('Patient Information')
+        pdf.info_row('Patient Name', result.get('patient_name', 'N/A'))
+        pdf.info_row('Date & Time', result['timestamp'])
+        pdf.info_row('AI Model Used', result['model_used'])
+        pdf.ln(4)
+
+        # ── MRI Scan Image ──
         image_path = result.get('image_path', '')
         if image_path and os.path.exists(image_path):
-            pdf.section_title('Uploaded MRI Scan')
-            pdf.image(image_path, x=65, w=80)
-            pdf.ln(5)
-
-        # ── Diagnosis Result ──
-        pdf.section_title('Diagnosis Result')
-        pdf.key_value('Predicted Class', result['predicted_class'])
-        pdf.key_value('Clinical Severity', result['severity'])
-        pdf.key_value('Confidence Score', f"{result['confidence']}%")
-        pdf.ln(3)
+            pdf.colored_section('Uploaded MRI Scan')
+            # Image with border
+            img_x = 60
+            img_w = 85
+            img_y = pdf.get_y()
+            pdf.set_draw_color(*ReportPDF.BORDER)
+            pdf.set_line_width(0.5)
+            pdf.image(image_path, x=img_x + 1, w=img_w - 2)
+            img_end_y = pdf.get_y()
+            pdf.rect(img_x, img_y, img_w, img_end_y - img_y + 1)
+            pdf.ln(6)
 
         # ── Class Probabilities ──
-        pdf.section_title('Class Probabilities')
-        pdf.set_font('Helvetica', 'B', 9)
-        pdf.set_fill_color(240, 240, 245)
-        pdf.set_text_color(60, 60, 60)
-        pdf.cell(95, 7, '  Class', 1, 0, 'L', True)
-        pdf.cell(95, 7, 'Probability (%)', 1, 1, 'C', True)
-        pdf.set_font('Helvetica', '', 9)
-        for cls, prob in result['all_probabilities'].items():
-            pdf.cell(95, 7, '  ' + cls, 1, 0, 'L')
-            pdf.cell(95, 7, f'{prob}%', 1, 1, 'C')
-        pdf.ln(5)
+        pdf.colored_section('Classification Probabilities')
+        probs = result['all_probabilities']
+        max_prob = max(probs.values()) if probs else 1
+
+        for cls, prob in probs.items():
+            cls_color = ReportPDF.SEVERITY_COLORS.get(cls, (100, 100, 100))
+            is_predicted = (cls == result['predicted_class'])
+
+            pdf.set_x(18)
+            # Class name
+            pdf.set_font('Helvetica', 'B' if is_predicted else '', 9)
+            pdf.set_text_color(*ReportPDF.DARK)
+            pdf.cell(50, 6, cls, 0, 0, 'L')
+
+            # Probability bar
+            bar_x = pdf.get_x()
+            bar_y = pdf.get_y() + 1
+            bar_max_w = 100
+            # Background
+            pdf.set_fill_color(235, 235, 245)
+            pdf.rect(bar_x, bar_y, bar_max_w, 4, 'F')
+            # Fill
+            pdf.set_fill_color(*cls_color)
+            fill_w = bar_max_w * (prob / 100) if prob > 0 else 0.5
+            pdf.rect(bar_x, bar_y, fill_w, 4, 'F')
+
+            # Percentage text
+            pdf.set_x(bar_x + bar_max_w + 3)
+            pdf.set_font('Helvetica', 'B' if is_predicted else '', 9)
+            pdf.set_text_color(*cls_color)
+            pdf.cell(20, 6, f'{prob}%', 0, 1, 'R')
+            pdf.ln(1)
+        pdf.ln(3)
 
         # ── Probable Cause ──
-        pdf.section_title('Probable Cause')
+        pdf.colored_section('Probable Cause', r=230, g=126, b=34)
         cause_lines = strip_html(result.get('cause', ''))
         for line in cause_lines:
             if line:
-                pdf.bullet_point(line)
-        pdf.ln(3)
+                pdf.detail_block(line)
+        pdf.ln(2)
 
         # ── Treatment Suggestions ──
-        pdf.section_title('Treatment Suggestions')
+        pdf.colored_section('Treatment Recommendations', r=46, g=204, b=113)
         treatment_lines = strip_html(result.get('treatment', ''))
         for line in treatment_lines:
             if line:
-                pdf.bullet_point(line)
-        pdf.ln(5)
+                pdf.detail_block(line)
+        pdf.ln(4)
 
-        # ── Disclaimer ──
-        pdf.set_draw_color(243, 156, 18)
-        pdf.set_line_width(0.8)
-        pdf.line(10, pdf.get_y(), 200, pdf.get_y())
-        pdf.ln(3)
-        pdf.set_font('Helvetica', 'B', 9)
+        # ── Disclaimer Box ──
+        disc_y = pdf.get_y()
+        # Check if enough space, else add page
+        if disc_y > 255:
+            pdf.add_page()
+            disc_y = pdf.get_y()
+
+        pdf.set_fill_color(255, 248, 235)
+        pdf.set_draw_color(243, 186, 80)
+        pdf.set_line_width(0.4)
+        pdf.rect(10, disc_y, 190, 28, 'DF')
+        # Warning stripe
+        pdf.set_fill_color(243, 186, 80)
+        pdf.rect(10, disc_y, 3, 28, 'F')
+
+        pdf.set_xy(16, disc_y + 2)
+        pdf.set_font('Helvetica', 'B', 8)
         pdf.set_text_color(180, 120, 20)
-        pdf.cell(0, 6, 'DISCLAIMER', 0, 1)
-        pdf.set_font('Helvetica', 'I', 8)
-        pdf.set_text_color(120, 120, 120)
-        pdf.multi_cell(0, 5,
-            'This report is generated by an AI model (NeuroScan AI) for educational and informational purposes only. '
-            'It is NOT a substitute for professional medical diagnosis. Please consult a qualified neurologist or '
-            'healthcare professional for proper medical advice, diagnosis, and treatment. The developers of this '
-            'system assume no liability for decisions made based on this report.'
+        pdf.cell(0, 5, 'IMPORTANT DISCLAIMER', 0, 1)
+        pdf.set_x(16)
+        pdf.set_font('Helvetica', '', 7.5)
+        pdf.set_text_color(130, 100, 50)
+        pdf.multi_cell(180, 4,
+            'This report is generated by NeuroScan AI, an artificial intelligence system, for educational and '
+            'informational purposes only. It does NOT constitute a medical diagnosis and should NOT be used as '
+            'a substitute for professional medical advice. Please consult a qualified neurologist or healthcare '
+            'professional for proper diagnosis and treatment. The developers assume no liability for decisions '
+            'made based on this report.'
         )
 
         # ── Generate PDF bytes ──
